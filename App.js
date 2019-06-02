@@ -1,14 +1,10 @@
-import React from 'react';
-import AppNavigator from './public/view/AppNavigator';
+import React, { Component } from 'react';
+import Entry from './src/Entry'
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
+export default class DTTXApp extends Component {
   render() {
     return (
-      <AppNavigator />
+      <Entry/>
     );
   }
 }
