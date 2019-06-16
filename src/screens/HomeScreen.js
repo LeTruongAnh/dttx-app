@@ -13,6 +13,7 @@ export default class HomeScreen extends React.Component {
     this.state = {
       user: {},
       dataList: [],
+      selectName: '',
     }
     this.socket = SocketIOClient(config.host, { jsonp: false })
     this.socket.on('api:fail', error => console.log(error))
@@ -21,8 +22,11 @@ export default class HomeScreen extends React.Component {
         dataList: dataList
       })
     })
-    this.socket.on('livestream:returnLink', link => {
-      navigator.navigate('Video', { link: link })
+    this.socket.on('livestream:returnLink', section => {
+      navigator.navigate('Video', {
+        selectName: this.state.selectName,
+        section: section
+      })
     })
     this.getLivestream = this.getLivestream.bind(this)
     this._renderHeader = this._renderHeader.bind(this)
@@ -44,11 +48,11 @@ export default class HomeScreen extends React.Component {
 
   _renderContent(item) {
     return (
-      <View style={styles.contentView} >
+      <View>
         {
-          item.courses.map((x, idx) => <Text key={idx} onPress={() => this.getLivestream(x.groupId._id)}>
-            {x.groupId && x.groupId.courseId.fullname + '-' + x.groupId.courseId.code + ' (' + (
-              x.groupId.teacherId && x.groupId.teacherId.lastName + ' ' + x.groupId.teacherId.firstName) + ')'}
+          item.courses.map((x, idx) => <Text key={idx} style={styles.contentView}
+            onPress={() => this.getLivestream(x.groupId)}>
+            {x.groupId && x.groupId.courseId.fullname + '-' + x.groupId.courseId.code + ' (' + (x.groupId.teacherId && x.groupId.teacherId.lastName + ' ' + x.groupId.teacherId.firstName) + ')'}
           </Text>)
         }
       </View>
@@ -65,31 +69,13 @@ export default class HomeScreen extends React.Component {
     })
   }
 
-  getLivestream(groupId) {
-    this.socket.emit('livestream:getLink', { groupId: groupId })
+  getLivestream(group) {
+    let selectName = group && group.courseId.fullname + '-' + group.courseId.code + ' (' + (group.teacherId && group.teacherId.lastName + ' ' + group.teacherId.firstName) + ')';
+    this.setState({ selectName: selectName })
+    this.socket.emit('livestream:getLink', { groupId: group._id })
   }
 
   render() {
-    const dataList = [
-      {
-        code: 'HK201',
-        year: '2018-2018',
-        courses: [
-          {
-            groupId: {
-              courseId: {
-                code: 'CO3001',
-                fullname: 'Lập trình web'
-              },
-              teacherId: {
-                lastName: 'Nguyễn Hứa',
-                firstName: 'Phùng'
-              }
-            }
-          }
-        ]
-      }
-    ]
     return (
       <View style={styles.container}>
         <Header>

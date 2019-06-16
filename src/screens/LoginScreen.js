@@ -32,7 +32,6 @@ export default class LoginScreen extends React.Component {
       password: this.state.password
     };
     this.socket.emit('user:login', data)
-    navigator.reset('Home')
   }
 
   _signInAsync = async (user) => {
